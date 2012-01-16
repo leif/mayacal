@@ -1,0 +1,74 @@
+<html>
+<script src="jquery-1.7.1.js"></script>
+<script>
+$(document).ready(function () { $('#in').focus(); });
+
+DAY_NAMES = [ "Imix'", "Ik'", "Ak'b'al", "K'an", "Chikchan", "Kimi", "Manik'",
+    "Lamat", "Muluk", "Ok", "Chuwen", "Eb'", "B'en", "Ix", "Men", "K'ib'",
+    "Kab'an", "Etz'nab'", "Kawak", "Ajaw" ]
+
+MONTH_NAMES = [ "Pop", "Wo'", "Sip", "Sotz'", "Sek", "Xul", "Yaxk'in'", "Mol",
+    "Ch'en", "Yax", "Sak'", "Keh", "Mak", "K'ank'in", "Muwan'", "Pax",
+    "K'ayab", "Kumk'u", "Wayeb'" ]
+
+// Unix epoch (Jan 1 1970 CE) in Gregorian Serial Days (days since Jan 1, 1 CE)
+UNIX_EPOCH_GSD = 719163
+
+// Mayan Long Count epoch (Aug 11, 3114 BCE) in GSD
+// (according to the "Goodman, Martinez, Thompson" correlation)
+MAYA_EPOCH_GSD = -1137142
+
+// Unix epoch in days since mayan epoch
+UNIX_EPOCH_MSD = UNIX_EPOCH_GSD - MAYA_EPOCH_GSD
+
+function unixSecondsToTzolkinDay( seconds ) {
+    day = UNIX_EPOCH_MSD + Math.floor( seconds / (24*60*60) )
+    day += 3 // the world began on 4 Ajaw
+    return ((day % 13) + 1).toString() +' '+ DAY_NAMES[ (day + 16) % 20 ]
+}
+function unixSecondsToHaabDay( seconds ) {
+    day  = UNIX_EPOCH_MSD + Math.floor( seconds / (24*60*60) )
+    day  += 348 // The world began on 8 Kumk'u, the 348th day of the year
+    day  %= 365
+    month = Math.floor( day / 20 )
+    day  %= 20
+    return day.toString() +' '+ MONTH_NAMES[ month ]
+}
+function unixSecondsToLongCount( seconds ) {
+    days   = UNIX_EPOCH_MSD + Math.floor( seconds / (24*60*60) )
+    baktun = Math.floor( days / 144000 )
+    days  %= 144000
+    katun  = Math.floor( days / 7200 )
+    days  %= 7200
+    tun    = Math.floor( days / 360 )
+    days  %= 360
+    winal  = Math.floor( days / 20 )
+    days  %= 20
+    kin    = days
+    return [baktun, katun, tun, winal, kin].join('.')
+}
+
+/*
+def longCountToUnixSeconds( longCount ):
+    baktun, katun, tun, winal, kin = map(int,
+            longCount.split(' ')[-1].split('.'))
+    days = baktun*144000 + katun*7200 + tun*360 + winal*20 + kin
+    return (days - UNIX_EPOCH_MSD) * (24*60*60)
+*/
+
+function unixSecondsToFullLongCount(seconds) {
+        return (
+            unixSecondsToTzolkinDay( seconds ) +' '+
+            unixSecondsToHaabDay   ( seconds ) +' '+
+            unixSecondsToLongCount ( seconds )
+            );
+}
+function mayacal(seconds) {
+    $('#out').html( unixSecondsToFullLongCount( seconds ) )
+}
+</script>
+<form onsubmit="mayacal($('#in').val()); return false">
+<input id=in>
+<div id=out>
+</form>
+</html>
