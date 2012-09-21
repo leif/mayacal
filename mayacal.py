@@ -23,6 +23,7 @@ $ ./mayacal.py `date +%s -d 'Dec 21 2012 UTC'` # Happy New B'ak'tun!
 Disclaimer: Everything I know about Mayan calendars I learned from
 Wikipedia while writing this. I recommend doing your own research before
 relying on this software for your end-of-the-b'ak'tun planning.
+Also, it does not account for leap seconds.
 """
 
 __author__    = "Leif Ryge <leif@synthesize.us>"
